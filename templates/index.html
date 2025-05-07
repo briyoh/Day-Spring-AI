@@ -1,0 +1,253 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MES | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #00796b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: width 0.3s;
+        }
+
+        .hamburger {
+            background-color: #004d40;
+            border: none;
+            color: white;
+            font-size: 24px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+            .sidebar-content h2 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+
+            .sidebar-content button {
+                background: none;
+                border: none;
+                color: white;
+                padding: 15px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                text-align: left;
+            }
+
+                .sidebar-content button:hover {
+                    background-color: #004d40;
+                }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            transition: margin-left 0.3s;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .initial-content {
+            display: block;
+        }
+
+        .tips-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .tip {
+            width: 30%;
+            text-align: center;
+        }
+
+            .tip img {
+                width: 100%;
+                border-radius: 8px;
+            }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #00796b;
+            color: white;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+
+            .tips-container {
+                flex-direction: column;
+            }
+
+            .tip {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <button class="hamburger">&#9776;</button>
+        <div class="sidebar-content">
+            <h2>Menu</h2>
+            <button onclick="toggleSection('patients')">Patient Records</button>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div id="initialContent" class="initial-content">
+            <h1>Welcome to Day Spring Health Center Prescriber Dashboard</h1>
+            <p>Click on "Patient Records" from the menu to view patient details.</p>
+            <p>HEALTHY LIFESTYLE TIPS!!!</p>
+            <div class="tips-container">
+                <div class="tip">
+                    <img src="{{ url_for('static', filename='images/a1.jpg') }}" alt="Health Tip 1">
+                    <h3>Stay Hydrated</h3>
+                    <p>Drink plenty of water throughout the day to stay hydrated and support overall health.</p>
+                </div>
+                <div class="tip">
+                    <img src="{{ url_for('static', filename='images/b.jpg') }}" alt="Health Tip 2">
+                    <h3>Eat a Balanced Diet</h3>
+                    <p>Incorporate a variety of fruits, vegetables, and proteins into your meals for balanced nutrition.</p>
+                </div>
+                <div class="tip">
+                    <img src="{{ url_for('static', filename='images/c.jpg') }}" alt="Health Tip 3">
+                    <h3>Exercise Regularly</h3>
+                    <p>Engage in physical activity at least 30 minutes a day to maintain a healthy body and mind.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="patients" class="content-section">
+            <div class="container">
+                <h1>Patient Records</h1>
+                <input type="text" class="search-bar" placeholder="Search by patient name...">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Patient No.</th>
+                            <th>Email</th>
+                            <th>Symptoms</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if patients %}
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.id }}</td>
+                            <td>{{ patient.patient_name }}</td>
+                            <td>{{ patient.patient_no }}</td>
+                            <td>{{ patient.email }}</td>
+                            <td>{{ patient.symptoms }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5">No patient records found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <button onclick="document.getElementById('addPatientForm').style.display='block'">Add New Patient</button>
+            </div>
+            <div id="addPatientForm" style="display:none;">
+                <h2>Add New Patient</h2>
+                <form action="{{ url_for('add_patient') }}" method="POST">
+                    <input type="text" name="name" placeholder="Patient Name" required>
+                    <input type="text" name="symptoms" placeholder="Symptoms" required>
+                    <button type="submit">Add Patient</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const isActive = section.classList.contains('active');
+            const sections = document.querySelectorAll('.content-section');
+
+            sections.forEach(sec => {
+                sec.classList.remove('active');
+                sec.style.display = 'none';
+            });
+
+            if (!isActive) {
+                section.classList.add('active');
+                section.style.display = 'block';
+                document.getElementById('initialContent').style.display = 'none'; // Hide initial content
+            }
+        }
+
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById('initialContent').style.display = 'block'; // Show initial content
+        });
+    </script>
+</body>
+</html>

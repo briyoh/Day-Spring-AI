@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Patient</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <!-- Sidebar remains the same -->
+        <button class="hamburger"></button>
+        <div class="sidebar-content">
+            <h2>Menu</h2>
+            <button onclick="window.location.href='{{ url_for('dashboard') }}'">Dashboard</button>
+            <button onclick="window.location.href='{{ url_for('generate_prescription') }}'">Generate Prescription</button>
+            <button onclick="window.location.href='{{ url_for('prescription_history') }}'">Prescription History</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Add New Patient</h1>
+        <form action="{{ url_for('add_patient') }}" method="POST" class="form-container">
+            <label for="name">Patient Name</label>
+            <input type="text" name="name" id="name" required>
+
+            <label for="symptoms">Symptoms</label>
+            <input type="text" name="symptoms" id="symptoms" required>
+
+            <button type="submit">Add Patient</button>
+        </form>
+    </div>
+</body>
+</html>

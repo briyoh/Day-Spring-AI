@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MES | Patient Records</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 80px;
+            background-color: #00796b;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-x: hidden;
+            transition: width 0.3s, transform 0.3s;
+        }
+
+            .sidebar:hover {
+                width: 250px;
+            }
+
+            .sidebar h2 {
+                color: #fff;
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+                text-align: center;
+                display: none;
+            }
+
+            .sidebar:hover h2 {
+                display: block;
+            }
+
+            .sidebar button {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 10px;
+                border: none;
+                background-color: #004d40;
+                color: white;
+                cursor: pointer;
+                font-size: 1rem;
+                border-radius: 5px;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar:hover button {
+                font-size: 0.9rem;
+            }
+
+            .sidebar button:hover {
+                background-color: #00796b;
+            }
+
+        .main-content {
+            margin-left: 80px;
+            transition: margin-left 0.3s;
+            width: calc(100% - 80px);
+            padding: 20px;
+        }
+
+        .sidebar:hover + .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+        }
+
+        .content-section {
+            display: none;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #00796b;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #00796b;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f1f1f1;
+        }
+
+        h1 {
+            color: #00796b;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #b2dfdb;
+            border-radius: 8px;
+            font-size: 16px;
+            width: calc(100% - 24px);
+        }
+
+        button {
+            background-color: #00796b;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #004d40;
+                transform: scale(1.05);
+            }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <button onclick="toggleSection('patients')">Patient Records</button>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <!-- Patient Records Section -->
+        <div id="patients" class="content-section">
+            <div class="container">
+                <h1>Patient Records</h1>
+                <input type="text" class="search-bar" placeholder="Search by patient name...">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Symptoms</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientsTableBody">
+                        <!-- Patient rows will be inserted here by Flask -->
+                        {% if patients %}
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.id }}</td>
+                            <td>{{ patient.patient_name }}</td>
+                            <td>{{ patient.symptoms }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="3">No patient records found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <button onclick="document.getElementById('addPatientForm').style.display='block'">Add New Patient</button>
+            </div>
+            <div id="addPatientForm">
+                <h2>Add New Patient</h2>
+                <form action="{{ url_for('add_patient') }}" method="POST">
+                    <input type="text" name="name" placeholder="Patient Name" required>
+                    <input type="text" name="symptoms" placeholder="Symptoms" required>
+                    <button type="submit">Add Patient</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const isActive = section.classList.contains('active');
+            const sections = document.querySelectorAll('.content-section');
+
+            sections.forEach(sec => {
+                sec.classList.remove('active');
+                sec.style.display = 'none';
+            });
+
+            if (!isActive) {
+                section.classList.add('active');
+                section.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById('patients').style.display = 'block'; // Default to showing patient records
+        });
+    </script>
+</body>
+</html>

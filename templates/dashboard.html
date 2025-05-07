@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day Spring Health | AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* [Keep all your existing styles the same] */
+        /* Only adding new styles for the download link */
+        .download-prescription-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 15px;
+            background: rgba(74, 144, 226, 0.2);
+            color: #4A90E2;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+            .download-prescription-link:hover {
+                background: rgba(74, 144, 226, 0.3);
+                text-decoration: underline;
+            }
+
+            .download-prescription-link i {
+                margin-right: 5px;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">🩺 Day Spring</div>
+            <nav>
+                <ul>
+                    <li id="chatBtn" class="active"><i class="fas fa-comment"></i> Chat</li>
+                    <li id="appointmentsBtn"><i class="fas fa-calendar-check"></i> Appointments</li>
+                    <li id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="chat-section" id="main-content">
+            <header class="chat-header">
+                <h2>Day Spring Health | AI Assistant</h2>
+            </header>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot">👋 Hi there! Describe your symptoms, and I'll assist you.</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="Message Day Spring AI..." autocomplete="off">
+                <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Handle sending messages
+            function sendMessage() {
+                let message = $("#message-input").val().trim();
+                if (message !== "") {
+                    // Add user message to chat
+                    addMessageToChat(message, 'user');
+                    $("#message-input").val("");
+
+                    // Scroll to bottom
+                    scrollChatToBottom();
+
+                    // Send to server
+                    $.ajax({
+                        url: "/chat",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ message: message }),
+                        success: function (data) {
+                            // Add diagnosis and prescription to chat
+                            addMessageToChat(`Diagnosis: ${data.diagnosis}`, 'bot');
+                            addMessageToChat(`Prescription: ${data.prescription}`, 'bot');
+
+                            // Add download link if available
+                            if (data.download_link) {
+                                addMessageToChat(
+                                    `<a href="${data.download_link}" class="download-prescription-link" download>
+                                            <i class="fas fa-file-pdf"></i> Download Prescription
+                                        </a>`,
+                                    'bot'
+                                );
+                            }
+
+                            scrollChatToBottom();
+                        },
+                        error: function (xhr) {
+                            const errorMsg = xhr.responseJSON?.error || 'Unable to process request';
+                            addMessageToChat(`⚠️ Error: ${errorMsg}`, 'bot error');
+                            scrollChatToBottom();
+                        }
+                    });
+                }
+            }
+
+            // Helper function to add messages to chat
+            function addMessageToChat(message, className) {
+                $("#chat-messages").append(`<div class="message ${className}">${message}</div>`);
+            }
+
+            // Helper function to scroll chat to bottom
+            function scrollChatToBottom() {
+                const chatMessages = $("#chat-messages")[0];
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Event listeners
+            $("#send-btn").click(sendMessage);
+
+            // Also allow sending with Enter key
+            $("#message-input").keypress(function (e) {
+                if (e.which === 13) { // Enter key
+                    sendMessage();
+                }
+            });
+
+            // [Keep your existing appointment and navigation handlers]
+            $("#appointmentsBtn").click(function () {
+                $("#main-content").fadeOut(300, function () {
+                    $.get("/appointments", function (data) {
+                        $("#main-content").html(`
+                                <div class='appointment-wrapper'>
+                                    <div class='appointment-container'>
+                                        ${data}
+                                    </div>
+                                </div>
+                            `).fadeIn(300);
+                    });
+                });
+            });
+
+            $("#chatBtn").click(function () {
+                location.reload();
+            });
+
+            $("#logoutBtn").click(function () {
+                window.location.href = "/logout";
+            });
+        });
+    </script>
+</body>
+</html>

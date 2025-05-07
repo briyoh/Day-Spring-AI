@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Doctor Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #004d40;
+            color: white;
+        }
+
+        .status-pending {
+            color: orange;
+        }
+
+        .status-approved {
+            color: green;
+        }
+
+        .status-completed {
+            color: blue;
+        }
+
+        .status-cancelled {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Doctor Dashboard</h1>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+    <h2>Patient Appointments</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td>{{ appt[1] }}</td>
+                <td>{{ appt[2] }}</td>
+                <td>{{ appt[3] }}</td>
+                <td>{{ appt[4] }}</td>
+                <td class="status-{{ appt[5] }}">{{ appt[5] }}</td>
+                <td>
+                    <a href="{{ url_for('manage_appointment', appointment_id=appt[0]) }}">Manage</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

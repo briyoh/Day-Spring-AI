@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #00796b;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+        }
+
+            .sidebar:hover {
+                width: 270px;
+            }
+
+            .sidebar a {
+                color: white;
+                text-decoration: none;
+                display: block;
+                padding: 10px 0;
+                font-size: 18px;
+                transition: 0.3s;
+            }
+
+                .sidebar a:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                    padding-left: 10px;
+                }
+
+        .main-content {
+            margin-left: 270px;
+            padding: 40px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+
+        .details {
+            text-align: left;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #00796b;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+            .btn:hover {
+                background: #004d40;
+            }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+            color: #00796b;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="/dashboard"><i class="fas fa-home"></i> Home</a>
+        <a href="/patient_records"><i class="fas fa-user"></i> Patient Records</a>
+        <a href="/prescription_history"><i class="fas fa-file-medical"></i> Prescription History</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="card">
+            <h2>Prescription Result</h2>
+
+            <div class="details">
+                <strong>Patient Name:</strong> {{ patient_name }} <br>
+                <strong>Diagnosis:</strong> {{ diagnosis }} <br>
+                <strong>Prescribed Medication:</strong> {{ medication }} <br>
+                <strong>Dosage:</strong> {{ dosage }} <br>
+                <strong>Instructions:</strong> {{ instructions }} <br>
+            </div>
+
+            <button class="btn" onclick="downloadPDF()"><i class="fas fa-download"></i> Download</button>
+            <button class="btn" onclick="emailPrescription()"><i class="fas fa-envelope"></i> Email</button>
+
+            <p class="loading" id="loadingMessage">Processing...</p>
+        </div>
+    </div>
+
+    <script>
+        function downloadPDF() {
+            document.getElementById('loadingMessage').style.display = 'block';
+            setTimeout(() => {
+                window.location.href = "/download_prescription";
+                document.getElementById('loadingMessage').style.display = 'none';
+            }, 1500);
+        }
+
+        function emailPrescription() {
+            document.getElementById('loadingMessage').style.display = 'block';
+            setTimeout(() => {
+                alert("Prescription emailed successfully!");
+                document.getElementById('loadingMessage').style.display = 'none';
+            }, 2000);
+        }
+    </script>
+
+</body>
+</html>
